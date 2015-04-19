@@ -1,0 +1,24 @@
+- Some braces, brackets, parens should be wrapped in quotes to denote a token
+instead of their corresponding grammar meaning.
+
+- Some keywords / reserved words should be bold.
+
+- action_specification needs semicolon
+
+- Most top-level decl rules need a newline above rule itself
+
+- Some rules result in reduce/reduce conflicts
+
+  Namespaces:
+  return_value_type
+
+  constvalue vs unary exp
+
+- field_mod and attr_entry could be reduced to a single rule
+
+- 75 reserved words... section 15.6 needs love?
+
+- action_function_declaration specifies action_statement+ but p4factory
+basic_routing and dc_example use empty actions
+
+- dc_example uses "selector" instead of "dynamic_action_selection"

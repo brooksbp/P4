@@ -1,0 +1,88 @@
+name:                P4
+version:             0.1.0.0
+synopsis:            A Haskell library for the P4 language.
+description:
+  P4 is a declarative language for expressing how packets are processed by the
+  pipeline of a network forwarding element such as a switch, NIC, router or
+  network function appliance.
+category:            Language
+stability:           alpha
+homepage:            http://github.com/brooksbp/P4
+bug-reports:         http://github.com/brooksbp/P4/issues
+license:             Apache-2.0
+license-file:        LICENSE
+author:              Brian Brooks
+maintainer:          brooks.brian@gmail.com
+copyright:           Copyright (c) 2015 Brian Brooks
+
+build-type:          Simple
+cabal-version:       >= 1.10
+
+extra-source-files:
+  .gitignore
+  LICENSE
+
+extra-doc-files:
+  README.md
+  doc/*
+
+library
+  exposed-modules:
+    Language.P4
+    Language.P4.AST
+    Language.P4.Parser
+    Language.P4.Parser.Lex
+    Language.P4.Parser.Parse
+    Language.P4.Parser.Preprocess
+    Language.P4.Parser.Tokens
+    Language.P4.Sema
+    Language.P4.Walk
+  build-depends:
+                base >= 4.7
+              , array
+              , mtl >= 2.2.1
+  build-tools: alex, happy
+  default-language: Haskell2010
+  ghc-options: -Wall -O2
+  hs-source-dirs: src
+
+executable p4c
+  main-is: Main.hs
+  build-depends:
+                base
+              , P4
+              , optparse-applicative >= 0.11.0.2
+  default-language: Haskell2010
+  ghc-options: -Wall -O2
+  hs-source-dirs: src/compiler
+
+test-suite Tests
+  type: exitcode-stdio-1.0
+  main-is: tests.hs
+  other-modules:
+                Parser
+                Sema
+                P4Factory
+  build-depends:
+                base
+              , Cabal
+              , P4
+              , HUnit
+              , test-framework
+              , test-framework-hunit
+              , directory
+              , filepath
+              , mtl >= 2.2.1
+  default-language: Haskell2010
+  ghc-options: -w -threaded -rtsopts -with-rtsopts=-N
+  hs-source-dirs: tests
+
+test-suite hlint
+  type: exitcode-stdio-1.0
+  main-is: hlint.hs
+  build-depends:
+                base
+              , hlint >= 1.7
+  default-language: Haskell2010
+  ghc-options: -w -threaded -rtsopts -with-rtsopts=-N
+  hs-source-dirs: tests
