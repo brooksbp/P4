@@ -173,8 +173,8 @@ data BitWidth
 data SignedOrSaturating = Signed | Saturating deriving (Eq, Show)
 
 data FieldListEntry
-  = FleFieldRef FieldRef
-  | FleHeaderRef HeaderRef
+  = FleHeaderRef HeaderRef
+  | FleFieldRef FieldRef
   | FleFieldValue FieldValue
   | FleFieldListName FieldListName
   | FleSEMA String
@@ -295,10 +295,10 @@ data ActionStmt
   deriving (Eq, Show)
 
 data ActionArg
-  = AaParamName ParamName
-  | AaFieldValue FieldValue
+  = AaHeaderRef HeaderRef
   | AaFieldRef FieldRef
-  | AaHeaderRef HeaderRef
+  | AaFieldValue FieldValue
+  | AaParamName ParamName
   | AaSEMA String
   deriving (Eq, Show)
 
