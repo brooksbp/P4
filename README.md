@@ -19,4 +19,7 @@ $ cd ..
 
 # run tests
 $ cabal test
+
+# dump AST for dc_example
+$ cabal run p4c -- ast-dump tests/p4factory/dc_example/dc_example.i.p4
 ```

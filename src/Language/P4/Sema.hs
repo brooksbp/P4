@@ -1,6 +1,7 @@
 module Language.P4.Sema
   ( -- * Namespace fixups
-    fixupFleSEMAs
+    fixupSEMAs
+  , fixupFleSEMAs
   , fixupRvtSEMAs
   , fixupAaSEMAs
   ) where
@@ -11,6 +12,13 @@ import Control.Monad.Except
 import Language.P4.AST
 import Language.P4.Walk
 
+fixupSEMAs :: Program -> Either String Program
+fixupSEMAs p = runExcept (go p)
+  where
+    go p' = do
+      p2 <- fixupFleSEMAs p'
+      p3 <- fixupRvtSEMAs p2
+      fixupAaSEMAs p3
 
 fixupFleSEMAs :: Program -> Except String Program
 fixupFleSEMAs p = foldM fixupFleSEMA p (extractFleSEMAs p)
