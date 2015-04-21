@@ -2,6 +2,7 @@ module Language.P4.Sema
   ( -- * Namespace fixups
     fixupFleSEMAs
   , fixupRvtSEMAs
+  , fixupAaSEMAs
   ) where
 
 import Control.Monad
@@ -111,3 +112,34 @@ extractControlFunctionName _ = []
 
 extractControlFunctionNames :: Program -> [ControlFunctionName]
 extractControlFunctionNames = query extractControlFunctionName
+
+
+fixupAaSEMAs :: Program -> Except String Program
+fixupAaSEMAs p = foldM fixupAaSEMA p (extractAaSEMAs p)
+
+fixupAaSEMA :: Program -> String -> Except String Program
+fixupAaSEMA p s
+  | s `elem` ix = return $ walk (g1 s) p
+  | otherwise   = return $ walk (g2 s) p
+  where
+    ix = extractInstanceNames p
+
+    g1 :: String -> ActionArg -> ActionArg
+    g1 r aa = case aa of
+      (AaSEMA r') | r' == r -> AaHeaderRef $ HeaderRef r Nothing
+      _                     -> aa
+    g2 :: String -> ActionArg -> ActionArg
+    g2 r aa = case aa of
+      (AaSEMA r') | r' == r -> AaParamName r
+      _                     -> aa
+
+extractActionArgs :: Decl -> [ActionArg]
+extractActionArgs (ActionFunctionDecl _ ax) = concatMap (\(ActionStmt _ aax) -> aax) ax
+extractActionArgs _ = []
+
+extractAaSEMA :: ActionArg -> [String]
+extractAaSEMA (AaSEMA s) = [s]
+extractAaSEMA _ = []
+
+extractAaSEMAs :: Program -> [String]
+extractAaSEMAs = query extractAaSEMA . query extractActionArgs

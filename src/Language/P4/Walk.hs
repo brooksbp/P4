@@ -18,6 +18,8 @@ instance Walkable a b => Walkable a [b] where
   walk f  = map (walk f)
   query f xs = mconcat $ map (query f) xs
 
+-- Program
+
 instance Walkable Program Program where
   walk f = f
   query f = f
@@ -33,6 +35,12 @@ instance Walkable FieldListEntry Program where
 instance Walkable ReturnValueType Program where
   walk f (Program xs) = Program (walk f xs)
   query f (Program xs) = query f xs
+
+instance Walkable ActionArg Program where
+  walk f (Program xs) = Program (walk f xs)
+  query f (Program xs) = query f xs
+
+-- Decl
 
 instance Walkable Decl Decl where
   walk f = f
@@ -53,6 +61,17 @@ instance Walkable ReturnValueType Decl where
   query f (ParserFunctionDecl _ (ParserFunctionBody _ rvt)) = query f rvt
   query _ _ = mempty
 
+instance Walkable ActionArg Decl where
+  walk f (ActionFunctionDecl h ax) = ActionFunctionDecl h (walk f ax)
+  walk _ x = x
+
+  query f (ActionFunctionDecl _ ax) = query f ax
+  query _ _ = mempty
+
+instance Walkable ReturnStmt ReturnStmt where
+  walk f = f
+  query f = f
+
 instance Walkable ReturnValueType ReturnStmt where
   walk f (RsReturnValueType r) = RsReturnValueType (walk f r)
   walk f (RsReturnSelect fx cx) = RsReturnSelect fx (walk f cx)
@@ -64,16 +83,19 @@ instance Walkable ReturnValueType CaseEntry where
   walk f (CaseEntry v r) = CaseEntry v (walk f r)
   query f (CaseEntry _ r) = query f r
 
-
-instance Walkable ReturnStmt ReturnStmt where
-  walk f = f
-  query f = f
-
 instance Walkable FieldListEntry FieldListEntry where
   walk f = f
   query f = f
 
 instance Walkable ReturnValueType ReturnValueType where
+  walk f = f
+  query f = f
+
+instance Walkable ActionArg ActionStmt where
+  walk f (ActionStmt n aax) = ActionStmt n (walk f aax)
+  query f (ActionStmt _ aax) = query f aax
+
+instance Walkable ActionArg ActionArg where
   walk f = f
   query f = f
 

@@ -9,24 +9,25 @@ import Language.P4
 
 semaTests :: Test
 semaTests = test $ [
-    goAST "1" t1i t1e
-  , goAST "2" t2i t2e
-  , goAST "3" t3i t3e
-  , goAST "4" t4i t4e
-  , goStr "5" t5i t5e
-  , goStr "6" t6i t6e
-  , goStr "7" t7i t7e
+    goAST fixupFleSEMAs "1" t1i t1e
+  , goAST fixupFleSEMAs "2" t2i t2e
+  , goAST fixupFleSEMAs "3" t3i t3e
+  , goAST fixupFleSEMAs "4" t4i t4e
+  , goStr fixupRvtSEMAs "5" t5i t5e
+  , goStr fixupRvtSEMAs "6" t6i t6e
+  , goStr fixupRvtSEMAs "7" t7i t7e
+  , goStr fixupAaSEMAs  "8" t8i t8e
   ]
 
-goAST name input expected =
-  name ~: assertEqual name expected (runExcept $ fixupFleSEMAs input)
+goAST semaFn name input expected =
+  name ~: assertEqual name expected (runExcept $ semaFn input)
 
-goStr name input expected =
+goStr semaFn name input expected =
   name ~: assertEqual name expected actual
   where
     actual = case parseProgram "" input of
       Left e  -> Left e
-      Right a -> runExcept $ fixupRvtSEMAs a
+      Right a -> runExcept $ semaFn a
 
 t1i = Program [
   FieldListDecl "fl1" [FleSEMA "unknownfieldlist"]
@@ -86,9 +87,25 @@ t7i = unlines [
   , "}"
   ]
 t7e = Right $ Program [
-  ControlFunctionDecl "cf1" (ControlBlock [])
+    ControlFunctionDecl "cf1" (ControlBlock [])
   , ParserFunctionDecl "p1" (ParserFunctionBody []
                              (RsReturnSelect
                               [FodrLatest "f3"]
                               [CaseEntry VlDefault (RvtControlFunc "cf1")]))
+  ]
+
+t8i = unlines [
+    "header h1 i1;"
+  , "action a1(p1, p2) {"
+  , "  a2(i1, pname);"
+  , "}"
+  ]
+t8e = Right $ Program [
+    ScalarInstanceDecl "h1" "i1"
+  , ActionFunctionDecl (ActionHeader "a1" ["p1","p2"])
+    [ActionStmt "a2" [
+          AaHeaderRef (HeaderRef "i1" Nothing)
+        , AaParamName "pname"
+        ]
+    ]
   ]
