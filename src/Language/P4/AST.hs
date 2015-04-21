@@ -52,7 +52,6 @@ module Language.P4.AST
  , ReturnValueType(..)
  , CaseEntry(..)
  , ValueList(..)
- , CaseReturnValueType(..)
  , ValueOrMasked(..)
  , FieldOrDataRef(..)
 
@@ -246,19 +245,12 @@ data ReturnValueType
   deriving (Eq, Show)
 
 data CaseEntry
-  = CaseEntry ValueList CaseReturnValueType
+  = CaseEntry ValueList ReturnValueType
   deriving (Eq, Show)
 
 data ValueList
   = VlValueList [ValueOrMasked]
   | VlDefault
-  deriving (Eq, Show)
-
-data CaseReturnValueType
-  = CrvtParserState ParserStateName
-  | CrvtControlFunc ControlFunctionName
-  | CrvtParserExcept ParserExceptionName
-  | CrvtSEMA String
   deriving (Eq, Show)
 
 data ValueOrMasked

@@ -46,12 +46,28 @@ instance Walkable FieldListEntry Decl where
   query _ _ = mempty
 
 instance Walkable ReturnValueType Decl where
-  walk f (ParserFunctionDecl a (ParserFunctionBody b (RsReturnValueType rvt))) =
-    ParserFunctionDecl a (ParserFunctionBody b (RsReturnValueType (walk f rvt)))
+  walk f (ParserFunctionDecl a (ParserFunctionBody b rvt)) =
+    ParserFunctionDecl a (ParserFunctionBody b (walk f rvt))
   walk _ x = x
 
-  query f (ParserFunctionDecl _ (ParserFunctionBody _ (RsReturnValueType rvt))) = query f rvt
+  query f (ParserFunctionDecl _ (ParserFunctionBody _ rvt)) = query f rvt
   query _ _ = mempty
+
+instance Walkable ReturnValueType ReturnStmt where
+  walk f (RsReturnValueType r) = RsReturnValueType (walk f r)
+  walk f (RsReturnSelect fx cx) = RsReturnSelect fx (walk f cx)
+
+  query f (RsReturnValueType r) = query f r
+  query f (RsReturnSelect _ cx) = query f cx
+
+instance Walkable ReturnValueType CaseEntry where
+  walk f (CaseEntry v r) = CaseEntry v (walk f r)
+  query f (CaseEntry _ r) = query f r
+
+
+instance Walkable ReturnStmt ReturnStmt where
+  walk f = f
+  query f = f
 
 instance Walkable FieldListEntry FieldListEntry where
   walk f = f

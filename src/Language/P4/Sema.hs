@@ -61,7 +61,6 @@ extractFieldListNames = query e
     e _ = []
 
 
-
 fixupRvtSEMAs :: Program -> Except String Program
 fixupRvtSEMAs p = foldM fixupRvtSEMA p (extractRvtSEMAs p)
 
@@ -84,16 +83,20 @@ fixupRvtSEMA p s
       (RvtSEMA r') | r' == r -> RvtControlFunc r
       _                      -> rvt
 
-extractReturnValueType :: Decl -> [ReturnValueType]
-extractReturnValueType (ParserFunctionDecl _ (ParserFunctionBody _ (RsReturnValueType rvt))) = [rvt]
-extractReturnValueType _ = []
+extractReturnStmt :: Decl -> [ReturnStmt]
+extractReturnStmt (ParserFunctionDecl _ (ParserFunctionBody _ rx)) = [rx]
+extractReturnStmt _ = []
+
+extractReturnValueType :: ReturnStmt -> [ReturnValueType]
+extractReturnValueType (RsReturnValueType r) = [r]
+extractReturnValueType (RsReturnSelect _ cx) = map (\(CaseEntry _ r) -> r) cx
 
 extractRvtSEMA :: ReturnValueType -> [String]
 extractRvtSEMA (RvtSEMA s) = [s]
 extractRvtSEMA _ = []
 
 extractRvtSEMAs :: Program -> [String]
-extractRvtSEMAs = query extractRvtSEMA . query extractReturnValueType
+extractRvtSEMAs = query extractRvtSEMA . query extractReturnValueType . query extractReturnStmt
 
 extractParserStateName :: Decl -> [ParserStateName]
 extractParserStateName (ParserFunctionDecl n _) = [n]

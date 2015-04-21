@@ -134,23 +134,23 @@ parserFunctionDeclAST = Program [
       FodrLatest "f3"
     , FodrCurrent 2 3
     ]
-    [ CaseEntry VlDefault (CrvtSEMA "name")
-    , CaseEntry VlDefault (CrvtParserExcept "pe1")
-    , CaseEntry (VlValueList [VomFieldValue 0x1]) (CrvtParserExcept "pe1")
+    [ CaseEntry VlDefault (RvtSEMA "name")
+    , CaseEntry VlDefault (RvtParserExcept "pe1")
+    , CaseEntry (VlValueList [VomFieldValue 0x1]) (RvtParserExcept "pe1")
     , CaseEntry (VlValueList [
                       VomFieldValue 0x1
                     , VomFieldValue 0x2
                     ])
-      (CrvtParserExcept "pe1")
+      (RvtParserExcept "pe1")
     , CaseEntry (VlValueList [
                     VomFieldValueMask 0x5 0xa
                     ])
-      (CrvtParserExcept "pe1")
+      (RvtParserExcept "pe1")
     , CaseEntry (VlValueList [
                       VomValueSetName "vs1"
                     , VomFieldValue 0x1
                     ])
-      (CrvtParserExcept "pe1")
+      (RvtParserExcept "pe1")
     ]
   ]
 

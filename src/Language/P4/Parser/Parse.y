@@ -325,9 +325,9 @@ ValueList :: { ValueList }
 : sep1(ValueOrMasked,",")  { VlValueList $1 }
 | "default"                { VlDefault }
 
-CaseReturnValueType :: { CaseReturnValueType }
-: SEMAString                         { CrvtSEMA $1 }
-| "parse_error" ParserExceptionName  { CrvtParserExcept $2 }
+CaseReturnValueType :: { ReturnValueType }
+: SEMAString                         { RvtSEMA $1 }
+| "parse_error" ParserExceptionName  { RvtParserExcept $2 }
 
 ValueOrMasked :: { ValueOrMasked }
 : FieldValue                    { VomFieldValue $1 }
