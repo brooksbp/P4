@@ -71,3 +71,9 @@ Future Optimizations:
 * Fields less than or equal to 64 bits can be translated to and from a C/machine
 native type.  E.g. "f4" can be represented as a `uint8_t` which will be more
 efficient in terms of space and time.
+
+### Compilation
+
+See `example_header_type_decl.c` for an idea of auto-generated code for
+translation between header type layout and bit vector layout.  Again, this is
+likely not performant, but functionally correct with room to improve.
