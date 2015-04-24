@@ -4,6 +4,7 @@ module Language.P4.AST
 
  , ConstValue(..)
  , Sign(..)
+ , c2i
 
  , FieldValue
 
@@ -114,19 +115,34 @@ data Decl
   | ControlFunctionDecl ControlFunctionName ControlBlock
   deriving (Eq, Show)
 
+data Sign = Positive | Negative deriving (Eq, Show)
+
 data ConstValue
   = ConstValue (Maybe Sign) (Maybe Integer) Integer
   deriving (Eq, Show)
 
+c2i :: ConstValue -> Integer
+c2i (ConstValue sign _ val) = case sign of
+  Nothing -> val
+  Just Positive -> val
+  Just Negative -> -val
+
+cBinOp :: ConstValue -> ConstValue -> (Integer -> Integer -> Integer) -> ConstValue
+cBinOp a b op = let value = c2i a `op` c2i b
+                    sign  = if value < 0 then Just Negative else Nothing in
+                 ConstValue sign Nothing (abs value)
+
 instance Num ConstValue where
-  (+) = error "undefined"
-  (-) = error "undefined"
-  (*) = error "undefined"
-  abs = error "undefined"
+  a + b = cBinOp a b (+)
+  a - b = cBinOp a b (-)
+  a * b = cBinOp a b (*)
+  abs (ConstValue (Just Negative) w v) = ConstValue Nothing w (abs v)
+  abs x = x
   signum = error "undefined"
   fromInteger = ConstValue Nothing Nothing
 
-data Sign = Positive | Negative deriving (Eq, Show)
+instance Ord ConstValue where
+  compare a b = compare (c2i a) (c2i b)
 
 type FieldValue = ConstValue
 

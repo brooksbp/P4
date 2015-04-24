@@ -36,6 +36,7 @@ library
     Language.P4.Parser.Preprocess
     Language.P4.Parser.Tokens
     Language.P4.Sema
+    Language.P4.Sema.Header
     Language.P4.Walk
   build-depends:
                 base >= 4.7
