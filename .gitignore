@@ -3,3 +3,8 @@ cabal.sandbox.config
 dist
 
 tests/p4factory
+
+*.o
+*.d
+softswitch
+softswitch.c
