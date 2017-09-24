@@ -1,4 +1,5 @@
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module CodeGen
   ( ppCgen
   ) where
@@ -9,19 +10,47 @@ import Language.C.Quote.C
 import qualified Language.C.Syntax as C
 import Text.PrettyPrint.Mainland
 
+
 ppCgen :: Program -> String
-ppCgen (Program xs) = pretty 80 $ ppr $ prepend $ concatMap cgen xs
+ppCgen (Program xs) = pretty 80 $ ppr $ prepend $ cgen xs
 
 prepend :: [C.Definition] -> [C.Definition]
 prepend defs = [cunit|
                 $esc:("#include \"src/rts/rts.h\"")
-                int main() { return 0; }
+                int main() {
+                    return 0;
+                }
                |] ++ defs
 
-cgen :: Decl -> [C.Definition]
-cgen (HeaderTypeDecl name body) = cHeaderTypeDecl name body
-cgen _ = []
+cgen :: [Decl] -> [C.Definition]
+cgen xs = (concatMap headers xs) ++ (pktInst xs)
 
+
+pktInst :: [Decl] -> [C.Definition]
+pktInst decls =
+  [cunit|struct packet_instance_t {
+           typename uint8_t *bytes;
+           int len;
+           int current_offset;
+           $sdecls:(concatMap cInstances decls)
+         };
+  |]
+
+cInstances :: Decl -> [C.FieldGroup]
+cInstances (ScalarInstanceDecl hdrTy name) = [
+    [csdecl|struct $id:hdrTy $id:name;|]
+  , [csdecl|int $id:(name ++ "_valid");|]
+  ]
+cInstances (ArrayInstanceDecl hdrTy name cnt) = [
+    [csdecl|struct $id:hdrTy $id:name[$int:(c2i cnt)];|]
+  , [csdecl|int $id:(name ++ "_valid")[$int:(c2i cnt)];|]
+  , [csdecl|int $id:(name ++ "_idx");|]
+  ]
+cInstances _ = []
+
+headers :: Decl -> [C.Definition]
+headers (HeaderTypeDecl name body) = cHeaderTypeDecl name body
+headers _ = []
 
 cHeaderTypeDecl :: String -> HeaderDecBody -> [C.Definition]
 cHeaderTypeDecl name (HeaderDecBody fields _ _) =

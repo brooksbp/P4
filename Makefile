@@ -2,7 +2,7 @@ BIN := softswitch
 
 CC := gcc
 LD := gcc
-CFLAGS :=
+CFLAGS :=-g -O0
 LDFLAGS :=
 
 SRCS := softswitch.c \
